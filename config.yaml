@@ -1,0 +1,190 @@
+# Application settings
+app:
+  name: "Vehicle Registration Dashboard"
+  description: "Dashboard for analyzing vehicle registration data from Vahan Dashboard"
+  debug: false
+  log_level: "INFO"
+  log_file: "vahan_dashboard.log"
+
+# Data settings
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  cache_dir: "data/cache"
+  output_dir: "output"
+  
+  # Data update frequency (in days)
+  update_frequency: 7
+  
+  # Maximum number of records to process at once
+  batch_size: 10000
+
+# Vahan Dashboard settings
+vahan:
+  base_url: "https://vahan.parivahan.gov.in/vahan4dashboard/"
+  
+  # Headers for HTTP requests
+  headers:
+    User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+    Accept-Language: "en-US,en;q=0.5"
+  
+  # Timeout for web requests (in seconds)
+  timeout: 30
+  
+  # Retry settings for failed requests
+  max_retries: 3
+  retry_delay: 5  # seconds
+  
+  # Selenium settings (if using for scraping)
+  selenium:
+    headless: true
+    window_size: "1920,1080"
+    implicit_wait: 10  # seconds
+    page_load_timeout: 60  # seconds
+
+# Database settings
+database:
+  enabled: true
+  type: "sqlite"  # or "postgresql", "mysql", etc.
+  name: "vahan_data.db"
+  path: "data/vahan_data.db"
+  
+  # Connection settings (for non-SQLite databases)
+  host: "localhost"
+  port: 5432
+  user: ""
+  password: ""
+
+# Dashboard settings
+dashboard:
+  title: "Vehicle Registration Dashboard"
+  description: "Interactive dashboard for vehicle registration data analysis"
+  
+  # Layout
+  layout: "wide"
+  initial_sidebar_state: "expanded"
+  
+  # Theme
+  theme:
+    primary_color: "#1f77b4"
+    background_color: "#ffffff"
+    secondary_background_color: "#f0f2f6"
+    text_color: "#262730"
+    font: "sans serif"
+  
+  # Page configuration
+  page_icon: "🚗"
+  meta_charset: "UTF-8"
+  viewport: "width=device-width, initial-scale=1.0"
+
+# Visualization settings
+visualization:
+  # Color palette
+  colors:
+    primary: "#1f77b4"  # Blue
+    secondary: "#ff7f0e"  # Orange
+    success: "#2ca02c"  # Green
+    danger: "#d62728"  # Red
+    warning: "#e377c2"  # Pink
+    info: "#17becf"  # Cyan
+    light: "#f7f7f7"
+    dark: "#2d3436"
+  
+  # Chart settings
+  chart:
+    background_color: "#ffffff"
+    plot_bgcolor: "#f8f9fa"
+    grid_color: "#e9ecef"
+    font_family: "Arial, sans-serif"
+    font_size: 12
+    
+    # Margins
+    margin: {"l": 50, "r": 50, "t": 60, "b": 50}
+    
+    # Animation
+    animation_duration: 500  # ms
+  
+  # Map settings (if using maps)
+  map:
+    style: "open-street-map"
+    center: {"lat": 20.5937, "lon": 78.9629}  # Center of India
+    zoom: 4
+    mapbox_style: "carto-positron"
+
+# Cache settings
+cache:
+  enabled: true
+  ttl: 86400  # Time to live in seconds (1 day)
+  max_size: 100  # Maximum number of items in cache
+
+# API settings (if applicable)
+api:
+  enabled: false
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  cors_enabled: true
+  rate_limit: "100 per day"
+  api_key_required: true
+
+# Email settings (for notifications)
+email:
+  enabled: false
+  smtp_server: "smtp.gmail.com"
+  smtp_port: 587
+  use_tls: true
+  username: ""
+  password: ""
+  from_email: ""
+  to_emails: []
+
+# Logging settings
+logging:
+  version: 1
+  disable_existing_loggers: false
+  
+  formatters:
+    standard:
+      format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  handlers:
+    console:
+      class: "logging.StreamHandler"
+      level: "INFO"
+      formatter: "standard"
+      stream: "ext://sys.stdout"
+    
+    file:
+      class: "logging.handlers.RotatingFileHandler"
+      level: "DEBUG"
+      formatter: "standard"
+      filename: "logs/vahan_dashboard.log"
+      maxBytes: 10485760  # 10MB
+      backupCount: 5
+      encoding: "utf8"
+  
+  root:
+    level: "INFO"
+    handlers: ["console", "file"]
+    propagate: true
+
+# Feature flags
+features:
+  enable_scraping: true
+  enable_api: false
+  enable_email_notifications: false
+  enable_caching: true
+  enable_logging: true
+
+# External services
+external_services:
+  google_maps_api_key: ""
+  mapbox_access_token: ""
+
+# Development settings
+dev:
+  debug_toolbar: false
+  reload: true
+  test_mode: false
+  mock_data: true  # Use mock data instead of real API calls
