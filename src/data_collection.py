@@ -55,14 +55,17 @@ class VahanDataCollector:
         self.cache_enabled = True
     
     def _get_cached_data(self, cache_key: str, max_age_hours: int = 24) -> Optional[Any]:
-        """Get data from cache if it exists and is not expired.
+        """Retrieve data from cache if it exists and hasn't expired.
         
         Args:
-            cache_key: Unique key for the cached data
-            max_age_hours: Maximum age of cached data in hours
+            cache_key (str): Unique identifier for the cached data
+            max_age_hours (int, optional): Maximum age of cached data in hours. Defaults to 24.
             
         Returns:
-            Cached data or None if not found or expired
+            Optional[Any]: Cached data if found and not expired, None otherwise
+            
+        Example:
+            >>> data = collector._get_cached_data('vehicle_data', max_age_hours=12)
         """
         if not self.cache_enabled:
             return None
@@ -83,11 +86,17 @@ class VahanDataCollector:
             return None
     
     def _save_to_cache(self, cache_key: str, data: Any) -> None:
-        """Save data to cache.
+        """Save data to the cache directory for future use.
         
         Args:
-            cache_key: Unique key for the cached data
-            data: Data to cache (must be JSON serializable)
+            cache_key (str): Unique identifier for the cached data
+            data (Any): Data to be cached (must be JSON serializable)
+            
+        Note:
+            Data is stored in JSON format in the .cache directory
+            
+        Example:
+            >>> collector._save_to_cache('vehicle_data', df.to_dict('records'))
         """
         if not self.cache_enabled:
             return
@@ -100,7 +109,18 @@ class VahanDataCollector:
             logger.warning(f"Failed to save cache {cache_key}: {e}")
     
     def setup_selenium(self) -> None:
-        """Set up Selenium WebDriver if needed."""
+        """Initialize and configure the Selenium WebDriver.
+        
+        This method sets up a Chrome WebDriver instance with the specified options.
+        It handles driver installation using webdriver_manager and configures
+        browser settings including headless mode and user agent.
+        
+        Raises:
+            Exception: If WebDriver initialization fails
+            
+        Note:
+            Requires Chrome browser to be installed on the system
+        """
         if not self.use_selenium or self.driver is not None:
             return
             
@@ -138,17 +158,49 @@ class VahanDataCollector:
             logger.error(f"Failed to initialize Selenium WebDriver: {e}")
             return False
     
-    def close(self):
-        """Close the WebDriver."""
+    def close(self) -> None:
+        """Safely close the WebDriver instance and release resources.
+        
+        This method should be called when the collector is no longer needed
+        to ensure proper cleanup of browser resources.
+        """
         if self.driver:
             self.driver.quit()
             logger.info("WebDriver closed.")
     
-    def fetch_vehicle_registrations(self, state: str = "All India", 
-                                  vehicle_type: str = "All", 
-                                  fuel_type: str = "All",
-                                  start_date: Optional[datetime] = None,
-                                  end_date: Optional[datetime] = None) -> pd.DataFrame:
+    def fetch_vehicle_registrations(self, 
+                                 state: str = "All India", 
+                                 vehicle_type: str = "All", 
+                                 fuel_type: str = "All",
+                                 start_date: Optional[datetime] = None,
+                                 end_date: Optional[datetime] = None) -> pd.DataFrame:
+        """Fetch vehicle registration data with the specified filters.
+        
+        Args:
+            state (str, optional): State name or 'All India' for national data. Defaults to "All India".
+            vehicle_type (str, optional): Type of vehicle (2W, 3W, 4W, etc.). Defaults to "All".
+            fuel_type (str, optional): Fuel type (Petrol, Diesel, Electric, etc.). Defaults to "All".
+            start_date (Optional[datetime], optional): Start date for data. Defaults to None (3 months ago).
+            end_date (Optional[datetime], optional): End date for data. Defaults to None (today).
+            
+        Returns:
+            pd.DataFrame: DataFrame containing the registration data with columns:
+                - date: Date of registration
+                - vehicle_type: Type of vehicle
+                - manufacturer: Vehicle manufacturer
+                - registrations: Number of registrations
+                - state: State/region
+                - district: District (if available)
+                
+        Example:
+            >>> collector = VahanDataCollector()
+            >>> df = collector.fetch_vehicle_registrations(
+            ...     state="MH",
+            ...     vehicle_type="2W",
+            ...     start_date=datetime(2023, 1, 1),
+            ...     end_date=datetime(2023, 12, 31)
+            ... )
+        """
         """Fetch vehicle registration data with the given filters.
         
         Args:
@@ -198,14 +250,32 @@ class VahanDataCollector:
             return self._generate_sample_data(start_date, end_date)
     
     def _generate_sample_data(self, start_date: datetime, end_date: datetime) -> pd.DataFrame:
-        """Generate sample data for testing purposes.
+        """Generate synthetic vehicle registration data for testing and demonstration.
+        
+        This method creates realistic-looking sample data with the following characteristics:
+        - Daily data points between start_date and end_date
+        - Multiple vehicle types (2W, 3W, 4W)
+        - Major manufacturers in the Indian market
+        - Realistic registration patterns
         
         Args:
-            start_date: Start date for the sample data
-            end_date: End date for the sample data
+            start_date (datetime): Start date for the sample data
+            end_date (datetime): End date for the sample data
             
         Returns:
-            DataFrame containing sample data
+            pd.DataFrame: Sample data with columns:
+                - date: Registration date
+                - vehicle_type: Type of vehicle (2W/3W/4W)
+                - manufacturer: Vehicle manufacturer
+                - registrations: Number of registrations
+                - state: Sample state
+                - district: Sample district
+                
+        Note:
+            The data is randomly generated but follows realistic patterns:
+            - 2W vehicles have higher registration numbers
+            - Monthly seasonality is included
+            - Manufacturer market share is roughly proportional to real-world data
         """
         # Generate dates between start and end date
         dates = pd.date_range(start=start_date, end=end_date, freq='D')
@@ -227,11 +297,30 @@ class VahanDataCollector:
         
         return pd.DataFrame(data)
 
-def get_available_datasets() -> List[Dict[str, str]]:
-    """Get list of available datasets in the data directory.
+def get_available_datasets() -> List[Dict[str, Any]]:
+    """Scan the data directory and list all available datasets.
+    
+    This function searches the data directory for CSV files and extracts metadata
+    such as file size, modification time, and record count.
     
     Returns:
-        List of dictionaries with dataset information
+        List[Dict[str, Any]]: List of dictionaries, where each dictionary contains:
+            - name: Name of the dataset (filename without extension)
+            - path: Full path to the dataset file
+            - size_mb: Size of the file in megabytes
+            - last_modified: Timestamp of last modification
+            - record_count: Number of records in the dataset (if CSV)
+            
+    Example:
+        >>> datasets = get_available_datasets()
+        >>> print(datasets[0])
+        {
+            'name': 'vehicle_registrations_2023',
+            'path': 'data/vehicle_registrations_2023.csv',
+            'size_mb': 2.5,
+            'last_modified': '2023-12-15 14:30:00',
+            'record_count': 1000
+        }
     """
     datasets = []
     if DATA_DIR.exists():

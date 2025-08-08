@@ -1,28 +1,32 @@
 # Core
-streamlit>=1.28.0
-pandas>=2.0.3,<2.1.0  # Avoid 2.1.0 which has Windows build issues with Python 3.12
-numpy>=1.24.0,<2.0.0
+streamlit==1.28.0
+pandas==2.0.3
+numpy==1.26.4
 
 # Data Processing
-python-dateutil>=2.8.2
-pytz>=2023.3
+python-dateutil==2.9.0
+pytz==2025.2
 
 # Data Visualization
-plotly>=5.15.0
-matplotlib>=3.7.0
+plotly==5.15.0
+matplotlib==3.10.5
 
-# Web Scraping (if needed)
-beautifulsoup4>=4.12.2
-selenium>=4.10.0
-requests>=2.31.0
+# Web Scraping
+beautifulsoup4==4.13.4
+selenium==4.34.2
+requests==2.32.4
 
 # Database
-sqlalchemy>=2.0.0
-duckdb>=0.8.0
+sqlalchemy==2.0.42
+duckdb==1.3.2
 
 # Utilities
-python-dotenv>=1.0.0
-tqdm>=4.65.0
+python-dotenv==1.1.1
+tqdm==4.67.1
 
-# Additional dependencies for Windows compatibility
-pywin32>=306; sys_platform == 'win32'
+# Dependencies
+pydantic==2.10.5
+pydantic_core==2.27.2
+
+# Windows compatibility
+pywin32==311; sys_platform == 'win32'
