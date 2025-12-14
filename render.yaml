@@ -5,7 +5,8 @@ services:
     plan: free
     buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
     startCommand: "streamlit run app.py --server.port=$PORT --server.address=0.0.0.0"
-    pythonVersion: "3.11.9"
+    runtime: "python"
+    pythonVersion: "3.11"
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11.9"
+        value: "3.11"
