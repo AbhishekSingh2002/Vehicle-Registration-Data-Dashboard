@@ -3,7 +3,10 @@ services:
     name: vehicle-dashboard
     env: python
     plan: free
-    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      chmod +x start.sh
     startCommand: "./start.sh"
     runtime: "python"
     pythonVersion: "3.11"
@@ -12,3 +15,5 @@ services:
         value: "3.11"
       - key: PORT
         value: "8501"
+      - key: PIP_NO_BINARY
+        value: "numpy"
